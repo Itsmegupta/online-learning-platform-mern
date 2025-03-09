@@ -1,11 +1,11 @@
-let userConfig = undefined
+let userConfig = undefined;
+
 try {
-  userConfig = await import('./v0-user-next.config')
+  userConfig = await import('./v0-user-next.config');  // Dynamically load user config
 } catch (e) {
-  // ignore error
+  console.error("Error loading user config:", e);  // Log error for debugging purposes
 }
 
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -21,14 +21,14 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-}
+  output: 'standalone'
+};
 
-mergeConfig(nextConfig, userConfig)
+// Merge user config with the default config
+mergeConfig(nextConfig, userConfig);
 
 function mergeConfig(nextConfig, userConfig) {
-  if (!userConfig) {
-    return
-  }
+  if (!userConfig) return nextConfig; // Return default if no user config
 
   for (const key in userConfig) {
     if (
@@ -38,11 +38,13 @@ function mergeConfig(nextConfig, userConfig) {
       nextConfig[key] = {
         ...nextConfig[key],
         ...userConfig[key],
-      }
+      };
     } else {
-      nextConfig[key] = userConfig[key]
+      nextConfig[key] = userConfig[key];
     }
   }
+
+  return nextConfig;
 }
 
-export default nextConfig
+export default nextConfig;
